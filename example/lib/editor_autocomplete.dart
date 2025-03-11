@@ -113,7 +113,6 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
         );
       },
       promptsBuilder: DefaultCodeAutocompletePromptsBuilder(
-        language: langDart,
         directPrompts: const [
           CodeFieldPrompt(
             word: 'foo',
@@ -139,14 +138,14 @@ class _AutoCompleteEditorState extends State<AutoCompleteEditor> {
       child: CodeEditor(
         style: CodeEditorStyle(
           fontSize: 18,
-          codeTheme: CodeHighlightTheme(
-            languages: {
-              'dart': CodeHighlightThemeMode(
-                mode: langDart
-              )
-            },
-            theme: atomOneLightTheme
-          ),
+          // codeTheme: CodeHighlightTheme(
+          //   languages: {
+          //     'dart': CodeHighlightThemeMode(
+          //       mode: langDart
+          //     )
+          //   },
+          //   theme: atomOneLightTheme
+          // ),
         ),
         controller: _controller,
         wordWrap: false,

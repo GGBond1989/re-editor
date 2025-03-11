@@ -308,3 +308,8 @@ class CodeAutocomplete extends StatelessWidget {
   }
 
 }
+
+class Mode {
+  final dynamic keywords;
+  const Mode({this.keywords});
+}

@@ -3,8 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_editor_exmaple/find.dart';
 import 'package:re_editor_exmaple/menu.dart';
-import 'package:re_highlight/languages/json.dart';
-import 'package:re_highlight/styles/atom-one-light.dart';
+import 'package:flutter_prism/flutter_prism.dart';
 
 class JsonEditor extends StatefulWidget {
 
@@ -31,14 +30,15 @@ class _JsonEditorState extends State<JsonEditor> {
   Widget build(BuildContext context) {
     return CodeEditor(
       style: CodeEditorStyle(
-        codeTheme: CodeHighlightTheme(
-          languages: {
-            'json': CodeHighlightThemeMode(
-              mode: langJson
-            )
+              highlightBuilder: (text) {
+            final prism = Prism(
+              mouseCursor: SystemMouseCursors.text,
+              style: Theme.of(context).brightness == Brightness.dark
+                  ? const PrismStyle.dark()
+                  : const PrismStyle(),
+            );
+            return prism.render(text, 'json');
           },
-          theme: atomOneLightTheme
-        ),
       ),
       controller: _controller,
       wordWrap: false,

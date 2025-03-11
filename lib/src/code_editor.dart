@@ -17,7 +17,7 @@ class CodeEditorStyle {
     this.cursorWidth,
     this.cursorLineColor,
     this.chunkIndicatorColor,
-    this.codeTheme,
+    this.highlightBuilder,
   }) : assert(fontSize == null || fontSize > 0),
     assert(fontHeight == null || fontHeight >= 1.0),
     assert(cursorWidth == null || cursorWidth > 0);
@@ -121,9 +121,8 @@ class CodeEditorStyle {
   /// The color of the chunked indicator at the end of the line.
   final Color? chunkIndicatorColor;
 
-  /// The code syntax highlighting rules and styles.
-  final CodeHighlightTheme? codeTheme;
-
+  /// The code syntax highlighting builder.
+  final HighlightBuilder? highlightBuilder;
 }
 
 /// Creates a code editor.
@@ -507,7 +506,7 @@ class _CodeEditorState extends State<CodeEditor> {
       margin:  widget.margin ?? EdgeInsets.zero,
       controller: _editingController,
       inputController: _inputController,
-      codeTheme: widget.style?.codeTheme,
+      highlightBuilder: widget.style?.highlightBuilder,
       readOnly: readOnly,
       autofocus: autofocus,
       wordWrap: wordWrap,
