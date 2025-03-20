@@ -85,11 +85,7 @@ class _CodeHighlighter extends ValueNotifier<List<List<TextSpan>>> {
       return;
     }
     final code = _controller.codeLines.asString(TextLineBreak.lf, false);
-    Future.delayed(Duration.zero, () {
-      value = splitSpansIntoLines(
-        builder.call(code),
-      );
-    });
+    value = splitSpansIntoLines(builder.call(code));
   }
 
   List<List<TextSpan>> splitSpansIntoLines(List<TextSpan> spans) {
@@ -103,6 +99,15 @@ class _CodeHighlighter extends ValueNotifier<List<List<TextSpan>>> {
         mouseCursor: cursor,
       ));
     }
+
+    TextSpan cloneSpan(TextSpan span, TextStyle? style) {
+      return TextSpan(
+        text: span.text,
+        children: span.children,
+        style: style?.merge(span.style) ?? span.style,
+        mouseCursor: span.mouseCursor,
+      );
+    }
     
     for (final span in spans) {
       if (span.text != null) {
@@ -114,11 +119,14 @@ class _CodeHighlighter extends ValueNotifier<List<List<TextSpan>>> {
           addLine(line, span.style, span.mouseCursor);
         }
       }
-      
-      if (span.children != null) {
-        final childLines = splitSpansIntoLines(
-          span.children!.whereType<TextSpan>().toList()
-        );
+
+      if ( span.children != null) {
+        final children = span.children!
+            .whereType<TextSpan>()
+            .map((child) => cloneSpan(child, span.style))
+            .toList();
+
+        final childLines = splitSpansIntoLines(children);
         if (childLines.isNotEmpty) {
           result.last.addAll(childLines.first);
           result.addAll(childLines.skip(1));
