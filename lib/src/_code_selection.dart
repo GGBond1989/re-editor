@@ -209,15 +209,36 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     widget.selectionOverlayController.hideToolbar();
   }
 
+  int _tapCount = 0;
   void _onDesktopTapDown(Offset position) {
     if (widget.controller.isComposing) {
       return;
     }
     final DateTime now = DateTime.now();
     if (_pointerTapTimestamp != null && (now.millisecondsSinceEpoch - _pointerTapTimestamp!.millisecondsSinceEpoch) <
-      kDoubleTapTimeout.inMilliseconds && _pointerTapPosition != null && _pointerTapPosition!.isSamePosition(position)) {
-      _onDoubleTap(position);
+      kTrippleTapTimeout.inMilliseconds && _pointerTapPosition != null && _pointerTapPosition!.isSamePosition(position)) {
+      _tapCount++;
+      if (_tapCount == 1) {
+        // 单击处理，保持原有逻辑
+        if (widget.controller.selection.baseOffset != -1) {
+          if (_isShiftPressed) {
+            _extendSelection(position, _SelectionChangedCause.tapDown);
+            return;
+          }
+        }
+        _pointerTapTimestamp = now;
+        _pointerTapPosition = position;
+        _selectPosition(position, _SelectionChangedCause.tapDown);
+      } else if (_tapCount == 2) {
+        // 双击处理，选中单词
+        _onDoubleTap(position);
+      } else if (_tapCount == 3) {
+        // 三击处理，选中整行
+        _onTrippleTap(position);
+        _tapCount = 0; // 重置点击计数
+      }
     } else {
+      _tapCount = 1; // 重置点击计数
       if (widget.controller.selection.baseOffset != -1) {
         if (_isShiftPressed) {
           _extendSelection(position, _SelectionChangedCause.tapDown);
@@ -240,6 +261,21 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
     }
     _handleByNextEvent = false;
     _selectPosition(position, _SelectionChangedCause.tapUp);
+  }
+
+ void _onTrippleTap(Offset position) {
+    final lineIndex = widget.controller.selection.baseIndex;
+    final codeLine = widget.controller.codeLines[lineIndex];
+    final selection = CodeLineSelection(
+      baseIndex: lineIndex,
+      baseOffset: 0,  // 行首
+      extentIndex: lineIndex,
+      extentOffset: codeLine.text.length,  // 行尾
+    );
+    
+    widget.controller.selection = selection;
+    widget.controller.makeCursorVisible();
+    _anchorSelection = selection;
   }
 
   void _onDoubleTap(Offset position) {
@@ -374,7 +410,7 @@ class _CodeSelectionGestureDetectorState extends State<_CodeSelectionGestureDete
 
   void _autoScrollWhenDragging() {
     final Offset? position = _dragPosition;
-    Future.delayed(const Duration(milliseconds: 100), (() {
+    Future.delayed(const Duration(milliseconds: 30), (() {
       if (_dragPosition == null || position == null) {
         return;
       }

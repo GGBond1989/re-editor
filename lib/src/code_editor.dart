@@ -7,6 +7,8 @@ class CodeEditorStyle {
   const CodeEditorStyle({
     this.fontSize,
     this.fontFamily,
+    this.fontFamilyFallback,
+    this.fontVariations,
     this.fontHeight,
     this.textColor,
     this.hintTextColor,
@@ -46,6 +48,8 @@ class CodeEditorStyle {
   /// family. When neither is provided, then the default platform font will
   /// be used.
   final String? fontFamily;
+  final List<String>? fontFamilyFallback;
+  final List<FontVariation>? fontVariations;
 
   /// The height of this text span, as a multiple of the font size.
   ///
@@ -469,7 +473,9 @@ class _CodeEditorState extends State<CodeEditor> {
     final TextStyle baseStyle = TextStyle(
       fontSize: widget.style?.fontSize ?? _kDefaultTextSize,
       fontFamily: widget.style?.fontFamily,
+      fontFamilyFallback: widget.style?.fontFamilyFallback,
       height: widget.style?.fontHeight ?? _kDefaultFontHeight,
+      fontVariations: widget.style?.fontVariations,
     );
     final bool readOnly = widget.readOnly ?? false;
     final bool autofocus = widget.autofocus ?? true;
